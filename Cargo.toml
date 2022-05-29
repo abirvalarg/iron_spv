@@ -1,0 +1,42 @@
+[package]
+name = "iron_spv"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+iron_spv_macros = { path="macros" }
+
+[dependencies.num_enum]
+version = "^0.5"
+default-features = false
+
+[build-dependencies]
+cc = "^1.0"
+
+[features]
+default = ["default_panic", "init_on_start"]
+
+# "broad" features
+heap = ["iron_spv_macros/heap"]
+gpio = ["iron_spv_macros/gpio"]
+
+# common utilities
+default_panic = []
+init_on_start = []
+
+# CPU(1 must be chosen)
+cortex_m4 = []
+
+# drivers
+gpio_f4 = ["gpio"]
+rcc_f40_f41 = ["cortex_m4"]
+
+# peripherals
+gpio_a = ["gpio"]
+gpio_b = ["gpio"]
+gpio_c = ["gpio"]
+
+# ugh... are you sure?
+i_know_i_am_not_using_arm = []
