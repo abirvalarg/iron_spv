@@ -3,6 +3,8 @@
 use core::sync::atomic::Ordering;
 use core::sync::atomic::AtomicIsize;
 
+pub use crate::system::Error;
+
 #[cfg(feature = "gpio")]
 mod gpio;
 #[cfg(feature = "heap")]
@@ -27,25 +29,6 @@ pub fn syscall(call: SysCall, a: isize, b: isize, c: isize) -> isize {
 }
 
 static SYS_RETURN: AtomicIsize = AtomicIsize::new(0);
-
-#[derive(num_enum::TryFromPrimitive)]
-#[repr(isize)]
-/// List of common system errors
-pub enum Error {
-	/// Can mean anything. Used by lazy people.
-	GeneralError = -1,
-
-	/// Specified function doesn't exist. Usually returned by [`syscall`]
-	/// if wrong call is specified but also can be returned
-	/// by underlying system function
-	NoFunction = -2,
-
-	/// Specified device doesn't exist
-	NoDevice = -3,
-
-	/// Bad parameter was specified
-	BadValue = -4
-}
 
 #[no_mangle]
 extern "C" fn _SVCall(call: usize, a: isize, b: isize, c: isize) {

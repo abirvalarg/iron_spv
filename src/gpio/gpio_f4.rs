@@ -1,4 +1,5 @@
 use core::ptr::{read_volatile, write_volatile};
+use crate::system::{self, Device, Error};
 #[cfg(feature = "rcc_f40_f41")]
 use crate::rcc::{RCC, Ahb1Module};
 use num_enum::TryFromPrimitive;
@@ -31,11 +32,6 @@ impl Gpio {
 		}
 	}
 
-	#[cfg(feature = "rcc_f40_f41")]
-	pub fn switch(&self, state: bool) {
-		RCC.switch_ahb1(self.rcc_pos, state);
-	}
-
 	pub fn pin_mode(&self, pin: u8, mode: PinMode) {
 		let moder = unsafe { read_volatile(&(*self.hw).MODER) };
 		let moder = moder & !(0b11 << (pin * 2)) | ((mode as usize) << (pin * 2));
@@ -66,6 +62,48 @@ impl Gpio {
 			(read_volatile(&(*self.hw).IDR) >> pin) & 1 != 0
 		}
 	}
+}
+
+impl Device for Gpio {
+	type Method = Method;
+
+	#[cfg(feature = "rcc_f40_f41")]
+	fn switch(&self, state: bool) {
+		RCC.switch_ahb1(self.rcc_pos, state);
+	}
+
+	fn method(&self, method: Method, a: isize, b: isize) -> system::Result {
+		use Method::*;
+
+		if (0..16).contains(&a) {
+			let pin = a as u8;
+			match method {
+				PinMode => {
+					let pin_mode = b as usize & 0b11;
+					let pull = (b >> 2) as usize & 0b11;
+					let _alternative = (b >> 4) as usize & 0xf;
+					self.pin_mode(pin, pin_mode.try_into().unwrap());
+					self.pin_pull(pin, pull.try_into().unwrap());
+					Ok(0)
+				}
+				DigitalWrite => {
+					self.write(a as u8, b != 0);
+					Ok(0)
+				}
+				DigitalRead => Ok(self.read(a as u8) as isize)
+			}
+		} else {
+			Err(Error::NoDevice)
+		}
+	}
+}
+
+#[derive(TryFromPrimitive)]
+#[repr(usize)]
+pub enum Method {
+	PinMode = 0,
+	DigitalWrite = 1,
+	DigitalRead = 2
 }
 
 #[derive(TryFromPrimitive)]

@@ -19,11 +19,11 @@ fn __panic(_info: &PanicInfo) -> ! {
 }
 
 mod init;
+mod priv_sync;
+mod system;
 
 #[cfg(feature = "heap")]
 mod heap;
-
-mod priv_sync;
 
 #[cfg(feature = "rcc_f40_f41")]
 mod rcc {
