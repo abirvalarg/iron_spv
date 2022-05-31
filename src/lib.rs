@@ -20,7 +20,8 @@ fn __panic(_info: &PanicInfo) -> ! {
 
 mod init;
 mod priv_sync;
-mod system;
+mod error;
+pub use error::{Error, Result};
 
 #[cfg(feature = "heap")]
 mod heap;
@@ -38,5 +39,14 @@ mod gpio {
 }
 
 pub mod syscall;
-
 pub mod prelude;
+
+/// A trait for abstract device. Used internally and will be usefull later
+pub trait Device {
+	type Method: TryFrom<usize>;
+
+	fn switch(&self, state: bool);
+	fn method(&self, _method: Self::Method, _a: isize, _b: isize) -> Result {
+		Err(Error::NoFunction)
+	}
+}

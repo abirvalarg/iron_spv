@@ -1,5 +1,5 @@
 use core::ptr::{read_volatile, write_volatile};
-use crate::system::{self, Device, Error};
+use crate::{Result, Error, Device};
 #[cfg(feature = "rcc_f40_f41")]
 use crate::rcc::{RCC, Ahb1Module};
 use num_enum::TryFromPrimitive;
@@ -72,7 +72,7 @@ impl Device for Gpio {
 		RCC.switch_ahb1(self.rcc_pos, state);
 	}
 
-	fn method(&self, method: Method, a: isize, b: isize) -> system::Result {
+	fn method(&self, method: Method, a: isize, b: isize) -> Result {
 		use Method::*;
 
 		if (0..16).contains(&a) {

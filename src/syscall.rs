@@ -3,7 +3,7 @@
 use core::sync::atomic::Ordering;
 use core::sync::atomic::AtomicIsize;
 
-pub use crate::system::Error;
+pub use crate::Error;
 
 #[cfg(feature = "gpio")]
 mod gpio;

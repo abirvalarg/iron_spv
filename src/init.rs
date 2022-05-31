@@ -1,4 +1,4 @@
-use crate::system::Device;
+use crate::Device;
 #[cfg(feature = "heap")]
 use core::ptr::addr_of_mut;
 

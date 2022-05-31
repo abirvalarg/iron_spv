@@ -1,14 +1,5 @@
 use num_enum::{TryFromPrimitive, TryFromPrimitiveError};
 
-pub trait Device {
-	type Method: TryFrom<usize>;
-
-	fn switch(&self, state: bool);
-	fn method(&self, _method: Self::Method, _a: isize, _b: isize) -> Result {
-		Err(Error::NoFunction)
-	}
-}
-
 #[derive(TryFromPrimitive)]
 #[repr(isize)]
 /// List of common system errors
